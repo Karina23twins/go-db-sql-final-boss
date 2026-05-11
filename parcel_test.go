@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,10 +36,8 @@ func TestAddGetDelete(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	require.NoError(t, err, "проверяем что нет ошибки")
+
 	defer db.Close()
 
 	store := NewParcelStore(db)
@@ -55,20 +54,19 @@ func TestAddGetDelete(t *testing.T) {
 	// get
 	// получите только что добавленную посылку, убедитесь в отсутствии ошибки
 	test_p, err = service.store.Get(test_p.Number)
-	require.NoError(t, err, "проверяем что нет ошибки")
+	assert.NoError(t, err, "проверяем что нет ошибки")
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
-	require.Equal(t, parcel.Address, test_p.Address)
-	require.Equal(t, parcel.Client, test_p.Client)
-	require.Equal(t, parcel.CreatedAt, test_p.CreatedAt)
-	// require.Equal(t, parcel.Number, test_p.Number)
-	require.Equal(t, parcel.Status, test_p.Status)
+	assert.Equal(t, parcel.Address, test_p.Address)
+	assert.Equal(t, parcel.Client, test_p.Client)
+	assert.Equal(t, parcel.CreatedAt, test_p.CreatedAt)
+	assert.NotEqual(t, 0, test_p.Number)
+	assert.Equal(t, parcel.Status, test_p.Status)
 
-	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
 	err = service.store.Delete(test_p.Number)
 	require.NoError(t, err, "проверяем что нет ошибки")
 	// проверьте, что посылку больше нельзя получить из БД
-	test_p, err = service.store.Get(test_p.Number)
+	_, err = service.store.Get(test_p.Number)
 	require.Error(t, err)
 }
 
@@ -103,7 +101,7 @@ func TestSetAddress(t *testing.T) {
 	// check
 	// получите добавленную посылку и убедитесь, что адрес обновился
 	test_p, err = service.store.Get(test_p.Number)
-	require.Equal(t, newAddress, test_p.Address)
+	assert.Equal(t, newAddress, test_p.Address)
 }
 
 // TestSetStatus проверяет обновление статуса
@@ -138,7 +136,7 @@ func TestSetStatus(t *testing.T) {
 	// check
 	// получите добавленную посылку и убедитесь, что статус обновился
 	test_p, err = service.store.Get(test_p.Number)
-	require.Equal(t, ParcelStatusSent, test_p.Status)
+	assert.Equal(t, ParcelStatusSent, test_p.Status)
 }
 
 // TestGetByClient проверяет получение посылок по идентификатору клиента
@@ -187,16 +185,16 @@ func TestGetByClient(t *testing.T) {
 	storedParcels, err := service.store.GetByClient(client)
 	// получите список посылок по идентификатору клиента, сохранённого в переменной client
 	// убедитесь в отсутствии ошибки
-	require.NoError(t, err, "проверяем что нет ошибки")
+	assert.NoError(t, err, "проверяем что нет ошибки")
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
-	require.Len(t, storedParcels, len(parcelMap))
+	assert.Len(t, storedParcels, len(parcelMap))
 
 	// check
 	for _, parcel := range storedParcels {
 		// в parcelMap лежат добавленные посылки, ключ - идентификатор посылки, значение - сама посылка
 		test_parcel := parcelMap[parcel.Number]
 		// убедитесь, что все посылки из storedParcels есть в parcelMap
-		require.Equal(t, parcel, test_parcel)
+		assert.Equal(t, parcel, test_parcel)
 		// убедитесь, что значения полей полученных посылок заполнены верно
 		require.Equal(t, parcel.Address, test_parcel.Address)
 		require.Equal(t, parcel.Client, test_parcel.Client)
