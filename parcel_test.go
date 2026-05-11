@@ -196,10 +196,10 @@ func TestGetByClient(t *testing.T) {
 		// убедитесь, что все посылки из storedParcels есть в parcelMap
 		assert.Equal(t, parcel, test_parcel)
 		// убедитесь, что значения полей полученных посылок заполнены верно
-		require.Equal(t, parcel.Address, test_parcel.Address)
-		require.Equal(t, parcel.Client, test_parcel.Client)
-		require.Equal(t, parcel.CreatedAt, test_parcel.CreatedAt)
-		require.Equal(t, parcel.Number, test_parcel.Number)
-		require.Equal(t, parcel.Status, test_parcel.Status)
+		assert.Equal(t, parcel.Address, test_parcel.Address)
+		assert.Equal(t, parcel.Client, test_parcel.Client)
+		assert.Equal(t, parcel.CreatedAt, test_parcel.CreatedAt)
+		assert.Equal(t, parcel.Number, test_parcel.Number)
+		assert.Equal(t, parcel.Status, test_parcel.Status)
 	}
 }
